@@ -116,4 +116,4 @@ class LensesMacro<T> {
 }
 #end
 
-@:autoBuild(util.LensesMacro.build()) interface LensesFor<T> { } 
+@:autoBuild(LensesMacro.build()) interface LensesFor<T> { } 
