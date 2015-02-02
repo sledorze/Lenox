@@ -1,0 +1,12 @@
+{
+    "name": "lenox",
+    "url": "https://github.com/sledorze/Lenox",
+    "license": "MIT",
+    "tags": ["functional", "lenses"],
+    "description": "Lean compile-time Lense macro generation Library.",
+    "version": "0.1.0",
+    "releasenote": "",
+    "contributors": ["sledorze"],
+    "dependencies": {
+    }
+}
