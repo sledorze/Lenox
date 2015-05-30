@@ -2,6 +2,7 @@ Lenox
 =====
 
 Lean compile-time Lense macro generation Library.
+Lenses purpose is to ease working using immutable data, removing boilerplate.
 
 ## Definition
 
