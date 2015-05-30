@@ -47,7 +47,7 @@ class Group_ implements LensesFor<Group> {}
 			leader : user,
 			followers : []
 		};
-		uppercaseMember(group, Group_.leader_.andThen(User_.name_));
+		withUppercaseMember(group, Group_.leader_.andThen(User_.name_));
 
 		
 ```
