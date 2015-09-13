@@ -1,0 +1,19 @@
+{
+  "name": "lenox",
+  "version": "1.0.0",
+  "description": "Lenox =====",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LeKiosqueFr/Lenox.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/LeKiosqueFr/Lenox/issues"
+  },
+  "homepage": "https://github.com/LeKiosqueFr/Lenox#readme"
+}
