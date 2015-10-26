@@ -8,12 +8,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/LeKiosqueFr/Lenox.git"
+    "url": "git+https://github.com/sledorze/Lenox.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/LeKiosqueFr/Lenox/issues"
+    "url": "https://github.com/sledorze/Lenox/issues"
   },
-  "homepage": "https://github.com/LeKiosqueFr/Lenox#readme"
+  "homepage": "https://github.com/sledorze/Lenox#readme"
 }
