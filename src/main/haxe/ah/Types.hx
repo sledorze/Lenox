@@ -1,6 +1,8 @@
 package ah;
 
+#if macro
 using tink.macro.Types;
+#end
 
 import haxe.macro.Type;
 
