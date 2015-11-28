@@ -1,5 +1,6 @@
 package;
 
+import haxe.PosInfos;
 import impl.Lense;
 
 import utest.Assert.*;
@@ -10,7 +11,6 @@ import Lenser;
 
 class LenseTest{
   public function new(){}
-
   public function testClassLenseBuild(){
       var lense    = new Lenser<LenseClass>();
       var impl     = new LenseClass();
@@ -44,9 +44,25 @@ class LenseTest{
         }
       }
     };
-
+    
     var data            = lense3.get(test_data);
     equals("world",data);
   }
+  public function testDynamicLeaf(){
+      var a : DynamicLeaf = {
+        a : "hello",
+        b : []
+      }
+      var lense0 = new Lenser<DynamicLeaf>();
 
+      var b : PosInfos = here();
+
+      var lense1 = new Lenser<PosInfos>();
+
+      var o = lense0.a.get(a);
+      same("hello",o);
+  }
+  private function here(?pos:PosInfos){
+    return pos;
+  }
 }

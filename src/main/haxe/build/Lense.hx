@@ -1,5 +1,6 @@
 package build;
 
+
 using stx.Strings;
 using stx.Arrays;
 using Lambda;
@@ -20,13 +21,14 @@ private typedef Data = {
     var lense : Dynamic;
 }
 class Lense{
+
   static public macro function build():Type{
     var local_type : Type = Tps.reduce(Context.getLocalType(),false);
     var sub_type = (switch(local_type){
       case TInst(t,params) : params[0];
       default : null;
     });
-    //trace('BUILD LENSE $sub_type');
+    //trace('$sub_type');
     return if(sub_type == null){
        local_type;
     }else{
@@ -72,11 +74,14 @@ class Lense{
     return out;
   }
   static private function defineAndReturnLenseClass(type_def:TypeDefinition){
-    var full_name_arr = type_def.pack.cons(type_def.name);
+    //trace(type_def.name);
+    var full_name_arr = type_def.pack.concat([type_def.name]);
     var full_name     = full_name_arr.join(".");
+    //trace(full_name);
     return try{
       Context.getType(full_name);
     }catch(e:Dynamic){
+      //trace('fail $e');
       Context.defineType(type_def);
       return try{
         Context.getType(full_name);
