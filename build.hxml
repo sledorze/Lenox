@@ -2,5 +2,5 @@
 -cp src/test/haxe
 -cp src/main/haxe
 hxml/libs.hxml
--js lensesmacro.js
--cmd nodejs lensesmacro.js
+-neko lensesmacro.n
+-cmd neko lensesmacro.n
