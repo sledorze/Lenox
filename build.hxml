@@ -1,4 +1,5 @@
 -main Test
+-lib stx_maybe
 -cp src/test/haxe
 -cp src/main/haxe
 hxml/libs.hxml

@@ -5,9 +5,12 @@ package ;
  * @author sledorze
  */
 
+import haxe.macro.Printer;
 import haxe.macro.Context;
 import haxe.macro.Expr;
+import haxe.macro.ExprTools;
 import haxe.macro.Type;
+import haxe.macro.TypeTools;
 
 import ah.BaseTypes;
 import ah.Types;
@@ -83,17 +86,24 @@ class Helper {
     if (field_typeName == null)
       return null;
 
-    var exprString = '
-      {
-        get : function (___obj : $object_typeName) return ___obj.$field_name,
-        set : function ($field_name : $field_typeName, ___obj : $object_typeName) {
-          var ___cp = Reflect.copy(___obj);
-          ___cp.$field_name = $field_name;
-          return ___cp;
-        }
-      }';
+    var getter_type = TypeTools.toComplexType(extensionType);
+    var setter_type = TypeTools.toComplexType(lense_field.type);
 
-    var expr = Context.parse(exprString, pos);
+    var getter = macro function(obj : $getter_type):hx.Maybe<$setter_type>{
+      return obj.$field_name;
+    }
+    var setter = macro function($field_name : $setter_type, obj : $getter_type):$getter_type{
+      obj.$field_name = $i{field_name};
+      return obj;
+    }
+    var lense = macro {
+      get : $getter,
+      set : $setter
+    }
+    var p = new Printer();
+
+    var expr       = lense;
+
     var kind_type = TPath({
       pack : ["impl"],
       name : "Lense",
