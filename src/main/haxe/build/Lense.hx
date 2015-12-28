@@ -1,6 +1,8 @@
 package build;
 
+import haxe.ds.StringMap;
 
+using tink.MacroApi;
 using stx.Strings;
 using stx.Arrays;
 using Lambda;
@@ -22,10 +24,14 @@ private typedef Data = {
 }
 class Lense{
 
+  static function __init__(){
+    Lense.cache = cache == null ? new StringMap() : cache;
+  }
+  static private var cache : StringMap<Dynamic>;
   static public macro function build():Type{
     var local_type : Type = Tps.reduce(Context.getLocalType(),false);
     var sub_type = (switch(local_type){
-      case TInst(t,params) : params[0];
+    case TInst(t,params) : params[0];//This is brittle, but 80%
       default : null;
     });
     //trace('$sub_type');
@@ -36,30 +42,25 @@ class Lense{
     }
   }
   static private function processSubType(sub_type:Type):Type{
-    //trace(sub_type);
-    var sub_type_base : BaseType = ah.Types.getBaseType(sub_type);
-    //trace(sub_type_base);
-    var sub_type_shim = null;
-    if(sub_type_base == null){
-      //this is an Anonymous Type;
-      var anon_type = ah.Types.getAnonType(sub_type);
-      sub_type_shim = {
-        pack : [],
-        name : 'AnonLense_${Strings.uuid("xxxxxxxx")}_',
-        pos  : Context.currentPos()
-      };
-    }else{
-      sub_type_shim = {
-        pack : sub_type_base.pack,
-        name : sub_type_base.name,
-        pos  : sub_type_base.pos
+    var sig = Context.signature(sub_type);
+    var idx = Types.register(function(){ return sub_type; });
+    cache.set(sig, idx);
+    var shim = ah.Types.getBaseType(sub_type).map(
+      function(x){
+        return { name : x.name, pack : x.pack, pos : x.pos };
       }
-    }
-    //trace(sub_type_shim);
-    var fields        = LensesMacro.Helper.classFieldsFor(sub_type);
+    ).getOrElse(
+      {
+        pack : [],
+        name : 'AnonLense$idx',
+        pos  : Context.currentPos()
+      }
+    );
+
+    var fields        = tink.macro.Types.getFields(sub_type).sure();
     var lenses        =
       fields
-        .map(function (cf) return Helper.lenseForClassField(sub_type, cf, sub_type_shim.pos))
+        .map(function(cf){return Helper.lenseForClassField(sub_type, cf, shim.pos);})
         .filter(function (x) return x!=null)
         .array()
         .map(function(x:Field){
@@ -67,7 +68,7 @@ class Lense{
           x.name   = x.name.endsWith("_") ? x.name.substr(0,-1) :  x.name;
           return x;
         });
-    var type_def      = createLenseClass(sub_type_shim,lenses);
+    var type_def      = createLenseClass(shim,lenses);
     var printer       = new haxe.macro.Printer();
     //trace(printer.printTypeDefinition(type_def));
     var out           = defineAndReturnLenseClass(type_def);
@@ -77,7 +78,7 @@ class Lense{
     //trace(type_def.name);
     var full_name_arr = type_def.pack.concat([type_def.name]);
     var full_name     = full_name_arr.join(".");
-    //trace(full_name);
+    //trtace(full_name);
     return try{
       Context.getType(full_name);
     }catch(e:Dynamic){

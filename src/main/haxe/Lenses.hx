@@ -3,11 +3,6 @@ package ;
 import hx.Maybe;
 import impl.Lense;
 import types.Lense in TLense;
-/**
- * ...
- * @author sledorze
- */
-
 
 class Lenses {
 

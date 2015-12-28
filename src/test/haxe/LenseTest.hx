@@ -13,6 +13,7 @@ class LenseTest{
   public function new(){}
   public function testClassLenseBuild(){
       var lense    = new Lenser<LenseClass>();
+      var lense    = new Lenser<LenseClass>();
       var impl     = new LenseClass();
           impl.a   = "3";
       var c        = lense.a.get(impl);
@@ -44,7 +45,7 @@ class LenseTest{
         }
       }
     };
-    
+
     var data            = lense3.get(test_data);
     equals("world",data);
   }

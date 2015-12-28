@@ -1,10 +1,12 @@
 package ah;
 
+using hx.Maybe;
+
 using stx.Arrays;
 import haxe.macro.Type;
 
 class BaseTypes{
-  public static function getFullPath(bt:BaseType):String{
+  public static function getFullPath(bt:BaseType):Maybe<String>{
     if(!Reflect.hasField(bt,"module")){
       return null; //ummm
     }

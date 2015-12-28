@@ -5,12 +5,18 @@ package ;
  * @author sledorze
  */
 
+using hx.Maybe;
+
 import haxe.macro.Printer;
 import haxe.macro.Context;
 import haxe.macro.Expr;
 import haxe.macro.ExprTools;
 import haxe.macro.Type;
 import haxe.macro.TypeTools;
+
+
+using tink.CoreApi;
+import tink.MacroApi;
 
 import ah.BaseTypes;
 import ah.Types;
@@ -25,66 +31,9 @@ typedef LenseField = {
 
 class Helper {
 
-  static function classFieldsToLenseFields(cf : Array<ClassField>) : Array<LenseField> return
-    cf.map(function (cf) return {
-      name : cf.name,
-      type : cf.type
-    }).array();
-
-  static function classFieldsForClassType(c : ClassType) : Array<LenseField> return
-    classFieldsToLenseFields(c.fields.get());
-
-  inline static function writeTypeName(name : String, params : Array<String>) : String return
-    if (params.length > 0)
-      name + "<" + params.join(",") + ">";
-    else
-      name;
-
-  private static function getFullPathForType(t:Type):Null<String>{
-    return BaseTypes.getFullPath(Types.getBaseType(t));
-  }
-  public static function nameForClassField(cf : ClassField) : String return
-    cf.name + " : " + displayForType(cf.type);
-
-  public static function displayForType(x : Type) : String {
-    var maybe_name = getFullPathForType(x);
-    return switch (x) {
-      case TType(t, params)
-        : writeTypeName(maybe_name, params.map(displayForType));
-      case TInst(t, params)
-        : writeTypeName(maybe_name, params.map(displayForType));
-      case TAnonymous(a)
-        : "{" + a.get().fields.map(nameForClassField).join(",") + "}";
-      case TFun(args, ret)
-        : args.map(function (x) return x.t).concat([ret]).map(displayForType).join(" -> ");
-      case TEnum(t, params) : writeTypeName(maybe_name, params.map(displayForType));
-      case TAbstract(ref, params) : writeTypeName(maybe_name,params.map(displayForType)); // throw 'lenses do not support abstracts $ref $params';
-    case TDynamic(t) : "Dynamic";
-      default : throw "not allowed " + Std.string(x);
-    };
-  }
-  public static function classFieldsFor(t : Type) : Array<LenseField> return
-    switch (t) {
-      case TMono( t ) : classFieldsFor(t.get());
-	    case TEnum( t,  params ) : [];
-	    case TInst( t,  params ) : classFieldsForClassType(t.get());
-	    case TType( t , params ) : classFieldsFor(t.get().type);
-      case TFun( args , ret ) : throw "lenses for function do not makes sense";
-	    case TAnonymous( a ) : classFieldsToLenseFields(a.get().fields);
-	    case TDynamic( t ) : throw "lenses for Dynamic do not make sense"; // or a dynamic way to support it
-	    case TLazy( f ) : classFieldsFor(f());
-      case TAbstract(ref, params) : classFieldsToLenseFields(ref.get().array);
-    };
-
   public static function lenseForClassField(extensionType : Type, lense_field : LenseField, pos : Position) : Field {
 
-    var object_typeName = displayForType(extensionType);
-    if (object_typeName == null) throw ("not supported" + Std.string(extensionType));
-
     var field_name      = lense_field.name;
-    var field_typeName  = displayForType(lense_field.type);
-    if (field_typeName == null)
-      return null;
 
     var getter_type = TypeTools.toComplexType(extensionType);
     var setter_type = TypeTools.toComplexType(lense_field.type);
@@ -100,11 +49,15 @@ class Helper {
       get : $getter,
       set : $setter
     }
-    var p = new Printer();
-
+    var p          = new Printer();
     var expr       = lense;
 
-    var kind_type = TPath({
+    /*
+    var hmm = Exprs.field(expr,field_name);
+    trace(hmm);
+    trace(p.printExpr(hmm));*/
+
+    var kind_type  = TPath({
       pack : ["impl"],
       name : "Lense",
       params : [
@@ -137,7 +90,7 @@ class LensesMacro<T> {
     }
 
     var pos = Context.currentPos();
-    var classFields = Helper.classFieldsFor(extensionType);
+    var classFields = tink.macro.Types.getFields(extensionType).sure();
     var lenses =
       classFields
         .map(function (cf) return Helper.lenseForClassField(extensionType, cf, pos))
