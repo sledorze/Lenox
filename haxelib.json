@@ -4,9 +4,10 @@
     "license": "MIT",
     "tags": ["functional", "lenses"],
     "description": "Lean compile-time Lense macro generation Library.",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "releasenote": "",
     "contributors": ["sledorze"],
     "dependencies": {
+      "stx_maybe" : "0.0.4"
     }
 }
