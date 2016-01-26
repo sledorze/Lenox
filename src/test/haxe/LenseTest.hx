@@ -63,7 +63,19 @@ class LenseTest{
       var o = lense0.a.get(a);
       same("hello",o);
   }
+  public function testLenseInSameModule(){
+    var val     = new LenseInSameModule();
+    var lenser  = new Lenser<LenseInSameModule>();
+  }
+  public function testLenseWithPrivates(){
+    var val     = new LenseTypeWithPrivates();
+    var lenser  = new Lenser<LenseTypeWithPrivates>();
+  }
   private function here(?pos:PosInfos){
     return pos;
   }
+}
+class LenseInSameModule{
+  public function new(){}
+  public var a : Dynamic;
 }

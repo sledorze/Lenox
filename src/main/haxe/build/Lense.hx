@@ -1,5 +1,7 @@
 package build;
 
+import Type.enumEq as enEq;
+
 import haxe.ds.StringMap;
 
 using tink.MacroApi;
@@ -34,6 +36,7 @@ class Lense{
     case TInst(t,params) : params[0];//This is brittle, but 80%
       default : null;
     });
+    sub_type = ah.Types.getSensibleTopType(sub_type);
     //trace('$sub_type');
     return if(sub_type == null){
        local_type;
@@ -60,7 +63,17 @@ class Lense{
     var fields        = tink.macro.Types.getFields(sub_type).sure();
     var lenses        =
       fields
-        .map(function(cf){return Helper.lenseForClassField(sub_type, cf, shim.pos);})
+        .filter(
+            function(x){
+              return (switch(x.kind){
+                case FMethod(m): false;
+                case FVar(a,b)
+                  if (enEq(a,AccNo) || enEq(a,AccNever) || enEq(b,AccNo) || enEq(b,AccNever)): false;
+                  default : true;
+                }) && x.isPublic;
+
+            }
+        ).map(function(cf){return Helper.lenseForClassField(sub_type, cf, shim.pos);})
         .filter(function (x) return x!=null)
         .array()
         .map(function(x:Field){
@@ -69,7 +82,7 @@ class Lense{
           return x;
         });
     var type_def      = createLenseClass(shim,lenses);
-    var printer       = new haxe.macro.Printer();
+    //var printer       = new haxe.macro.Printer();
     //trace(printer.printTypeDefinition(type_def));
     var out           = defineAndReturnLenseClass(type_def);
     return out;

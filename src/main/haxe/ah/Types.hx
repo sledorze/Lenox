@@ -24,4 +24,11 @@ class Types{
       default            : null;
     }
   }
+  public static function getSensibleTopType(t:Type):Type{
+    return switch t {
+      case TMono( t ) :   t.get();
+      case TLazy( f ) :   f();
+      default : t;
+    }
+  }
 }
