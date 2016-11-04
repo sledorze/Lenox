@@ -38,14 +38,17 @@ class Helper {
   public static function nameForClassField(cf : ClassField) : String return
     cf.name + " : " + nameForType(cf.type);
       
+  public static function nameForDef(dt: BaseType) return
+    dt.pack.concat([dt.name]).join(".");
+
   public static function nameForType(x : Type) : String return
     switch (x) {
-      case TType(t, params) : typeName(t.get().name, params.map(nameForType));
-      case TInst(t, params) : typeName(t.get().name, params.map(nameForType));
+      case TType(t, params) : typeName(nameForDef(t.get()), params.map(nameForType));
+      case TInst(t, params) : typeName(nameForDef(t.get()), params.map(nameForType));
       case TAnonymous(a) : "{" + a.get().fields.map(nameForClassField).join(",") + "}";
       case TFun(args, ret): args.map(function (x) return x.t).concat([ret]).map(nameForType).join(" -> ");
-      case TEnum(t, params) : typeName(t.get().name, params.map(nameForType));
-      case TAbstract(ref, params) : ref.get().name; // throw 'lenses do not support abstracts $ref $params';
+      case TEnum(t, params) : typeName(nameForDef(t.get()), params.map(nameForType));
+      case TAbstract(ref, params) : nameForDef(ref.get()); // throw 'lenses do not support abstracts $ref $params';
       default : throw "not allowed " + Std.string(x);
     };
     
