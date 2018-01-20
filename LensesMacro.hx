@@ -49,6 +49,7 @@ class Helper {
       case TFun(args, ret): args.map(function (x) return x.t).concat([ret]).map(nameForType).join(" -> ");
       case TEnum(t, params) : typeName(nameForDef(t.get()), params.map(nameForType));
       case TAbstract(ref, params) : nameForDef(ref.get()); // throw 'lenses do not support abstracts $ref $params';
+      case TDynamic(t) : "Dynamic";
       default : throw "not allowed " + Std.string(x);
     };
     
