@@ -46,7 +46,12 @@ class Helper {
       case TType(t, params) : typeName(nameForDef(t.get()), params.map(nameForType));
       case TInst(t, params) : typeName(nameForDef(t.get()), params.map(nameForType));
       case TAnonymous(a) : "{" + a.get().fields.map(nameForClassField).join(",") + "}";
-      case TFun(args, ret): args.map(function (x) return x.t).concat([ret]).map(nameForType).join(" -> ");
+      case TFun(args, ret): {
+        var _params = args.map(function (x) return x.t).map(nameForType);
+        var params = _params.length == 0 ? ["Void"] : _params;
+        var result = [ret].map(nameForType);
+        return params.concat(result).join(" -> ");
+      }
       case TEnum(t, params) : typeName(nameForDef(t.get()), params.map(nameForType));
       case TAbstract(ref, params) : nameForDef(ref.get()); // throw 'lenses do not support abstracts $ref $params';
       case TDynamic(t) : "Dynamic";
